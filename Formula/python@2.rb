@@ -1,16 +1,9 @@
 class PythonAT2 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/2.7.17/Python-2.7.17.tar.xz"
-  sha256 "4d43f033cdbd0aa7b7023c81b0e986fd11e653b5248dac9144d508f11812ba41"
-  revision 1
+  url "https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz"
+  sha256 "b62c0e7937551d0cc02b8fd5cb0f544f9405bafc9a54d3808ed4594812edef43"
   head "https://github.com/python/cpython.git", :branch => "2.7"
-
-  bottle do
-    sha256 "accfaa922708f00afb69ab230199f96e6ecdddd248a1eca586ce1e5e5cfd732b" => :catalina
-    sha256 "54d3351d6be8268b2f5017894dcc8e083811dfa3812bdb9f79f989873b9a4542" => :mojave
-    sha256 "cfd5c6eeac37065d19f527bb0798a9caf1928bab3340cd545224861a3c82f219" => :high_sierra
-  end
 
   # setuptools remembers the build flags python is built with and uses them to
   # build packages later. Xcode-only systems need different flags.
@@ -231,7 +224,6 @@ class PythonAT2 < Formula
     cfg.atomic_write <<~EOS
       [install]
       prefix=#{HOMEBREW_PREFIX}
-
       [build_ext]
       include_dirs=#{include_dirs.join ":"}
       library_dirs=#{library_dirs.join ":"}
@@ -246,7 +238,6 @@ class PythonAT2 < Formula
       import re
       import os
       import sys
-
       if sys.version_info[0] != 2:
           # This can only happen if the user has set the PYTHONPATH for 3.x and run Python 2.x or vice versa.
           # Every Python looks at the PYTHONPATH variable and we can't fix it here in sitecustomize.py,
@@ -256,7 +247,6 @@ class PythonAT2 < Formula
           exit('Your PYTHONPATH points to a site-packages dir for Python 2.x but you are running Python ' +
                str(sys.version_info[0]) + '.x!\\n     PYTHONPATH is currently: "' + str(os.environ['PYTHONPATH']) + '"\\n' +
                '     You should `unset PYTHONPATH` to fix this.')
-
       # Only do this for a brewed python:
       if os.path.realpath(sys.executable).startswith('#{rack}'):
           # Shuffle /Library site-packages to the end of sys.path and reject
@@ -267,12 +257,10 @@ class PythonAT2 < Formula
                                              not p.startswith('/System')]
           # .pth files have already been processed so don't use addsitedir
           sys.path.extend(library_packages)
-
           # the Cellar site-packages is a symlink to the HOMEBREW_PREFIX
           # site_packages; prefer the shorter paths
           long_prefix = re.compile(r'#{rack}/[0-9\._abrc]+/Frameworks/Python\.framework/Versions/2\.7/lib/python2\.7/site-packages')
           sys.path = [long_prefix.sub('#{site_packages}', p) for p in sys.path]
-
           # LINKFORSHARED (and python-config --ldflags) return the
           # full path to the lib (yes, "Python" is actually the lib, not a
           # dir) so that third-party software does not need to add the
@@ -282,7 +270,6 @@ class PythonAT2 < Formula
               build_time_vars['LINKFORSHARED'] = '-u _PyMac_Error #{opt_prefix}/Frameworks/Python.framework/Versions/2.7/Python'
           except:
               pass  # remember: don't print here. Better to fail silently.
-
           # Set the sys.executable to use the opt_prefix
           sys.executable = '#{opt_bin}/python2.7'
     EOS
@@ -291,13 +278,10 @@ class PythonAT2 < Formula
   def caveats; <<~EOS
     Pip and setuptools have been installed. To update them
       pip install --upgrade pip setuptools
-
     You can install Python packages with
       pip install <package>
-
     They will install into the site-package directory
       #{site_packages}
-
     See: https://docs.brew.sh/Homebrew-and-Python
   EOS
   end
